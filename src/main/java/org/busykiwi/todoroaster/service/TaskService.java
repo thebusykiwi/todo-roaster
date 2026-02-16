@@ -2,6 +2,7 @@ package org.busykiwi.todoroaster.service;
 
 import org.busykiwi.todoroaster.model.Status;
 import org.busykiwi.todoroaster.model.Task;
+import org.busykiwi.todoroaster.storage.JsonStorageService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,11 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class TaskService {
-    private List<Task> tasks = new ArrayList<>();
-    private int idCount = 1;
+    JsonStorageService jsonStorageService = new JsonStorageService();
+    private List<Task> tasks = jsonStorageService.loadTasks();
+    private int idCount = tasks.stream().mapToInt(Task::getId).max().orElse(0);
 
     public Task addTask(String title, Status status) {
-        Task task = new Task(idCount++, title, status);
+        Task task = new Task(++idCount, title, status);
         tasks.add(task);
         return task;
     }
@@ -39,6 +41,10 @@ public class TaskService {
     }
 
     public int taskCount() {
-        return tasks.size();
+        return (int) tasks.stream().filter(task -> task.getStatus() != Status.DONE).count();
+    }
+
+    public void saveTasks() {
+        jsonStorageService.saveTasks(tasks);
     }
 }

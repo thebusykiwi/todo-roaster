@@ -51,6 +51,7 @@ public class TaskController {
                     printTasks();
                     break;
                 case 5:
+                    saveTask();
                     System.out.println("Thanks for choosing us!");
                     return;
                 default:
@@ -148,5 +149,9 @@ public class TaskController {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    public void saveTask() {
+        taskService.saveTasks();
     }
 }
