@@ -5,12 +5,13 @@ import org.busykiwi.todoroaster.model.Status;
 import org.busykiwi.todoroaster.model.Task;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TaskRepository {
     public Task saveTask(Task task) {
-        String sql = "INSERT INTO TASKS VALUES (title, status, created_at, updated_at)(?, ?, ?, ?);";
+        String sql = "INSERT INTO TASKS (title, status, created_at, updated_at) VALUES (?, ?, ?, ?);";
 
         try (Connection con = DatabaseConfig.getConnection()) {
             PreparedStatement ps = con.prepareStatement(sql);
@@ -27,14 +28,14 @@ public class TaskRepository {
         return task;
     }
 
-    public boolean updateTask(Task task) {
+    public boolean updateTask(int id, Status status) {
         String sql = "UPDATE TASKS SET STATUS = ?, UPDATED_AT = ? WHERE ID = ?;";
 
         try (Connection con = DatabaseConfig.getConnection()) {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, task.getStatus().toString());
-            ps.setTimestamp(2, Timestamp.valueOf(task.getUpdatedAt()));
-            ps.setInt(3, task.getId());
+            ps.setString(1, status.toString());
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(3, id);
 
             int rows = ps.executeUpdate();
 
@@ -44,17 +45,16 @@ public class TaskRepository {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
         return false;
     }
 
-    public boolean deleteTask(Task task) {
+    public boolean deleteTask(int id) {
         String sql = "DELETE FROM TASKS WHERE ID = ?;";
 
         try (Connection con = DatabaseConfig.getConnection()) {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, task.getId());
+            ps.setInt(1, id);
 
             int rows = ps.executeUpdate();
             if (rows > 0) {
@@ -69,7 +69,7 @@ public class TaskRepository {
     }
 
     public List<Task> getTasks() {
-        String sql = "SELECT * FROM TASKS;";
+        String sql = "SELECT * FROM TASKS ORDER BY ID ASC;";
 
         List<Task> tasks = new ArrayList<>();
         try (Connection con = DatabaseConfig.getConnection()) {
@@ -93,10 +93,11 @@ public class TaskRepository {
     }
 
     public int tasksCount() {
-        String sql = "SELECT count(*) FROM TASKS where STATUS = 'DONE';";
+        String sql = "SELECT COUNT(*) FROM TASKS where STATUS <> ?;";
 
         try (Connection con = DatabaseConfig.getConnection()) {
             PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1,"DONE");
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {

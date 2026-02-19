@@ -12,6 +12,13 @@ public class Task {
     public Task(int id, String title, String status) {
     }
 
+    public Task(String title, Status status) {
+        this.status = status;
+        this.title = title;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+    }
+
     @Override
     public String toString() {
         return id + ". " + title +

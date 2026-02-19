@@ -51,7 +51,6 @@ public class TaskController {
                     printTasks();
                     break;
                 case 5:
-                    saveTask();
                     System.out.println("Thanks for choosing us!");
                     return;
                 default:
@@ -68,7 +67,7 @@ public class TaskController {
         Status status = readStatus();
         if (status != null) {
             Task task = taskService.addTask(title, status);
-            System.out.println("Task added successfully. ID: " + task.getId());
+            System.out.println("Task added successfully.");
         } else {
             System.out.println("Invalid status");
         }
@@ -149,9 +148,5 @@ public class TaskController {
         } catch (IllegalArgumentException e) {
             return null;
         }
-    }
-
-    public void saveTask() {
-        taskService.saveTasks();
     }
 }
